@@ -1,0 +1,38 @@
+services:
+  legal-utero:
+    build:
+      context: .
+      args:
+        VITE_GA4_MEASUREMENT_ID: ${VITE_GA4_MEASUREMENT_ID:-}
+        GOOGLE_SITE_VERIFICATION: ${GOOGLE_SITE_VERIFICATION:-}
+        BING_SITE_VERIFICATION: ${BING_SITE_VERIFICATION:-}
+    image: legal-utero:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - carubra-network
+      - uteroindonesia-network
+      - utero-id-network
+
+networks:
+  carubra-network:
+    external: true
+    name: carubra-network
+  uteroindonesia-network:
+    external: true
+    name: uteroindonesia-network
+  utero-id-network:
+    external: true
+    name: utero-id-network

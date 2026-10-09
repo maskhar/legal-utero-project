@@ -1,0 +1,13 @@
+.git
+.gitignore
+.codegraph
+node_modules
+dist
+coverage
+.env
+.env.*
+!.env.example
+*.log
+docs
+compose.yaml
+Dockerfile

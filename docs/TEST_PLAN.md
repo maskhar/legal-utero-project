@@ -1,0 +1,7 @@
+# Verification plan — no rebuild results yet
+
+Automated: `npm run build` and `npm run lint` once implementation exists; add unit/component tests for content validation, metadata, navigation, mobile menu, FAQ ARIA/focus and CTA destinations. Playwright: direct loads and navigation for nine primary routes and each approved article; 404 status, mobile interactions, contact actions, broken internal links/images and console errors. Crawl built output without JavaScript for unique title/description/canonical/H1, OG, sitemap/robots, visible copy, redirects and real status codes.
+
+Visual/manual: compare reference and implementation at 375, 390, 430, 768, 1024, 1366, 1440, 1920px. Inspect hero crop, section order, spacing, typography, header/cards/footer and overflow. Test keyboard, touch, screen reader, 200% zoom and reduced motion; axe plus manual accessibility review. Record Lighthouse mobile/desktop scores against targets 90+ performance, 95+ accessibility/best practices/SEO; do not assert scores without measurement.
+
+Release checks: dependency/image audit, secrets absent from `dist`, security headers/CSP, Nginx config, container health, three network attachments, reverse proxy, HTTPS, live pages and rollback. Record date, browser/device, commands/results and remaining defects for each gate. Missing owner approval, DNS or infrastructure permissions means specific gate blocked, not completed.

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://legal.iuteroindonesia.com/sitemap.xml

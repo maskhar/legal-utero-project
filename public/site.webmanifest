@@ -1,0 +1,11 @@
+{
+  "name": "UTERO Legal",
+  "short_name": "UTERO Legal",
+  "description": "Pendampingan penelusuran, pendaftaran, proteksi, dan pengelolaan merek.",
+  "lang": "id-ID",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ce181e",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

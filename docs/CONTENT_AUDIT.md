@@ -1,0 +1,9 @@
+# Content audit — publication policy
+
+Public WordPress API snapshot (2026-10-09): 71 pages, 16 published posts. Of 16 post titles, 11 Indonesian and five unrelated English demo-looking posts. Published status does not establish editorial approval. Retain original publication dates and review legal recency, accuracy, ownership and image rights before republication.
+
+Relevant Indonesian candidates include `fungsi-merek-yang-wajib-diketahui-pebisnis`, `mengungkap-alasan-penolakan-merek-anda`, `brand-voice-bisa-kena-pasal`, `karya-berharga-lindungi-dengan-hukum`, `legalisasi-branding`, `legalitas-dalam-digital-marketing-dan-pembuatan-konten`, `lindungi-hak-eksklusif-atas-nama-dan-logo-dari-pelanggaran`, `mengoptimalkan-nilai-bisnis-melalui-perlindungan-merek-terdaftar`, `dapatkan-hak-eksklusif-untuk-nama-dan-logo-bisnis-anda`. Review full bodies and approval before listing.
+
+`cara-syarat-pengurusan-legalitas-perusahaan-terbaru-2024` and `...-2024-2` share title and 2026-03-19 date; compare bodies/canonicals before deciding deduplication or redirect. Exclude from new listing pending review: `supporting-employees-through-the-menopause-guidance-for-employers`, `policies-procedures-for-startups`, `outsource-accounting-hr-functions`, `shining-a-new-light-on-marsha-p-jonson`, `my-bedside-table-the-fashion-designer`. Decide legacy HTTP response with SEO review, not blanket homepage redirects.
+
+Remove unrelated template shop/home/team pages from navigation. Confirm 1998 history, team names/credentials/consent, pricing, 24/7 claim, testimonials, address and hours with business owner. Use typed approved records with slug, title, summary/body, original URL/date, review status/date, image/alt and canonical. Unapproved content stays out of sitemap. No invented legal news, statistics or outcomes.
