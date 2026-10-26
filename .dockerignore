@@ -1,6 +1,6 @@
 .git
 .gitignore
-.codegraph
+.codegraph/
 node_modules
 dist
 coverage

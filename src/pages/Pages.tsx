@@ -1,4 +1,5 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { type FormEvent, useState } from 'react'
+import { Clock, ExternalLink, LoaderCircle, Mail, MapPin, Phone, Search } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { Checks, Cta, SectionTitle, SimpleHero } from '../components/Sections'
 import { articles } from '../content/articles'
@@ -17,9 +18,123 @@ const pages: Record<string, PageInfo> = {
 function ServicePage({ page }: { page: PageInfo }) {
   return <><SimpleHero eyebrow={page.eyebrow} title={page.title} description={page.intro} /><section className="section"><div className="shell page-detail"><div><SectionTitle align="left" eyebrow="UTERO Legal" title={page.heading} /><p>{page.body}</p><Checks items={page.points} /><a className="button" href={whatsappUrl} target="_blank" rel="noreferrer">Konsultasi WhatsApp</a></div><img src={page.image} alt="Pendampingan UTERO Legal" /></div></section><Cta /></>
 }
+
+type Trademark = {
+  app_number: string
+  mark_name: string
+  class: string
+  owner: string
+  consultant: string | null
+  reg_date: string | null
+}
+
+type TrademarkResponse = {
+  success: boolean
+  data: Trademark[]
+  pagination?: { page: number; limit: number; total: number }
+}
+
+function TrademarkSearch() {
+  const [results, setResults] = useState<Trademark[]>([])
+  const [total, setTotal] = useState<number | null>(null)
+  const [page, setPage] = useState(1)
+  const [term, setTerm] = useState('')
+  const [selectedClass, setSelectedClass] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  async function search(query: string, niceClass: string, requestedPage: number) {
+    setStatus('loading')
+    setMessage('')
+
+    const params = new URLSearchParams({ q: query, page: String(requestedPage), limit: '10' })
+    if (niceClass) params.set('class', niceClass)
+
+    try {
+      const response = await fetch(`/api/merek/search?${params}`, { cache: 'no-store' })
+      const payload = await response.json() as TrademarkResponse
+      if (!response.ok || !payload.success || !Array.isArray(payload.data)) throw new Error('Pencarian sedang tidak tersedia. Silakan coba lagi.')
+      setResults(payload.data)
+      setTotal(payload.pagination?.total ?? payload.data.length)
+      setPage(requestedPage)
+      setStatus('success')
+    } catch (error) {
+      setStatus('error')
+      setMessage(error instanceof Error ? error.message : 'Pencarian sedang tidak tersedia. Silakan coba lagi.')
+    }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const query = String(form.get('q') ?? '').trim()
+    const niceClass = String(form.get('class') ?? '').trim()
+
+    if (query.length < 2) {
+      setStatus('error')
+      setMessage('Masukkan sedikitnya 2 karakter nama merek.')
+      return
+    }
+
+    setResults([])
+    setTotal(null)
+    setTerm(query)
+    setSelectedClass(niceClass)
+    void search(query, niceClass, 1)
+  }
+
+  return <section className="section section-pale trademark-search" aria-labelledby="trademark-search-title">
+    <div className="shell trademark-search-grid">
+      <div className="trademark-search-intro">
+        <span className="eyebrow">Pencarian Awal</span>
+        <h2 id="trademark-search-title">Cari nama merek terdaftar</h2>
+        <p>Gunakan nama merek dan kelas NICE untuk melihat data pencarian awal dari API Indonesia yang bersumber dari data DJKI.</p>
+        <div className="search-disclaimer"><strong>Penting:</strong> hasil ini bukan keputusan resmi, bukan jaminan merek dapat didaftarkan, dan belum mencakup kajian kemiripan bunyi, logo, atau unsur dominan.</div>
+        <a className="official-link" href="https://pdki-indonesia.dgip.go.id/" target="_blank" rel="noreferrer">Verifikasi di PDKI resmi <ExternalLink size={16} aria-hidden="true" /></a>
+      </div>
+      <div className="trademark-search-panel">
+        <form onSubmit={handleSubmit} className="trademark-search-form">
+          <label htmlFor="trademark-name">Nama merek</label>
+          <input id="trademark-name" name="q" type="search" minLength={2} maxLength={80} required placeholder="Contoh: Utero" autoComplete="off" />
+          <label htmlFor="trademark-class">Kelas NICE <span>(opsional)</span></label>
+          <select id="trademark-class" name="class" defaultValue="">
+            <option value="">Semua kelas</option>
+            {Array.from({ length: 45 }, (_, index) => <option key={index + 1} value={index + 1}>Kelas {index + 1}</option>)}
+          </select>
+          <button className="button" type="submit" disabled={status === 'loading'}>
+            {status === 'loading' ? <LoaderCircle className="search-spinner" size={18} aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}
+            {status === 'loading' ? 'Mencari...' : 'Cari Merek'}
+          </button>
+        </form>
+
+        <div className="trademark-results" aria-live="polite" aria-busy={status === 'loading'}>
+          {status === 'error' && <p className="search-message search-error" role="alert">{message}</p>}
+          {total !== null && <>
+            <p className="search-message"><strong>{total.toLocaleString('id-ID')}</strong> data ditemukan. Halaman {page}.</p>
+            {results.length === 0 ? <p className="search-empty">Tidak ada hasil yang cocok. Coba ejaan atau kelas lain.</p> : <ul className="trademark-result-list">
+              {results.map(result => <li key={`${result.app_number}-${result.class}`}>
+                <div><h3>{result.mark_name}</h3><span className="trademark-class">Kelas {result.class}</span></div>
+                <dl>
+                  <div><dt>Nomor permohonan</dt><dd>{result.app_number}</dd></div>
+                  <div><dt>Pemilik</dt><dd>{result.owner || '-'}</dd></div>
+                  {result.reg_date && <div><dt>Tanggal pendaftaran</dt><dd>{result.reg_date}</dd></div>}
+                </dl>
+              </li>)}
+            </ul>}
+            {total > 10 && <nav className="trademark-pagination" aria-label="Halaman hasil pencarian">
+              <button type="button" disabled={page === 1 || status === 'loading'} onClick={() => void search(term, selectedClass, page - 1)}>Sebelumnya</button>
+              <span>{page} / {Math.ceil(total / 10)}</span>
+              <button type="button" disabled={page >= Math.ceil(total / 10) || status === 'loading'} onClick={() => void search(term, selectedClass, page + 1)}>Berikutnya</button>
+            </nav>}
+          </>}
+        </div>
+      </div>
+    </div>
+  </section>
+}
 export function ProfilePage() { return <ServicePage page={pages.profile} /> }
 export function HakiPage() { return <ServicePage page={pages.haki} /> }
-export function SearchPage() { return <ServicePage page={pages.search} /> }
+export function SearchPage() { return <><SimpleHero eyebrow={pages.search.eyebrow} title={pages.search.title} description={pages.search.intro} /><TrademarkSearch /><section className="section"><div className="shell page-detail"><div><SectionTitle align="left" eyebrow="UTERO Legal" title={pages.search.heading} /><p>{pages.search.body}</p><Checks items={pages.search.points} /><a className="button" href={whatsappUrl} target="_blank" rel="noreferrer">Konsultasi WhatsApp</a></div><img src={pages.search.image} alt="Pendampingan penelusuran merek UTERO Legal" /></div></section><Cta /></> }
 export function RegistrationPage() { return <ServicePage page={pages.registration} /> }
 export function ProtectionPage() { return <ServicePage page={pages.protection} /> }
 export function BrandTrackingPage() { return <ServicePage page={pages.tracking} /> }

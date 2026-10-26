@@ -1,3 +1,4 @@
+name: website-legal-uteroindonesia-com
 services:
   legal-utero:
     build:
@@ -8,9 +9,12 @@ services:
         BING_SITE_VERIFICATION: ${BING_SITE_VERIFICATION:-}
     image: legal-utero:local
     restart: unless-stopped
+    environment:
+      API_INDONESIA: ${API_INDONESIA:?API_INDONESIA wajib diisi}
     read_only: true
     tmpfs:
       - /tmp
+      - /etc/nginx/conf.d:uid=101,gid=101,mode=0700
     security_opt:
       - no-new-privileges:true
     cap_drop:
